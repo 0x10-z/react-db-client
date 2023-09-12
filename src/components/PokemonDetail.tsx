@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchPokemonByName } from "../services/apiService"; // Asegúrate de actualizar esta función en tu apiService
+import { fetchPokemonById } from "../services/apiService"; // Asegúrate de actualizar esta función en tu apiService
 import { Pokemon } from "../types";
 import Modal from "./Modal";
 
@@ -16,7 +16,7 @@ const PokemonDetail: React.FC = () => {
 
   useEffect(() => {
     const loadPokemon = async () => {
-      const pokeData = await fetchPokemonByName(param);
+      const pokeData = await fetchPokemonById(parseInt(param));
       setPokemon(pokeData);
     };
 

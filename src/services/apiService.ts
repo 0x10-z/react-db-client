@@ -8,7 +8,8 @@ export const fetchPokemons = async (): Promise<Pokemon[]> => {
   //return data.results; // La API retorna la lista en la clave 'results'
   const formattedData = await Promise.all(
     data.results.map(async (pokemon: any) => {
-      const pokemonDetail = await fetchPokemonByName(pokemon.name);
+      const id = pokemon.url.split("/")[6];
+      const pokemonDetail = await fetchPokemonById(id);
       return pokemonDetail;
     })
   );
@@ -16,12 +17,12 @@ export const fetchPokemons = async (): Promise<Pokemon[]> => {
   return formattedData;
 };
 
-export const fetchPokemonByName = async (name: string): Promise<Pokemon> => {
+export const fetchPokemonById = async (id: number): Promise<Pokemon> => {
   function capitalizeFirstLetter(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  const response = await fetch(`${BASE_URL}/pokemon/${name}`);
+  const response = await fetch(`${BASE_URL}/pokemon/${id}`);
   const data = await response.json();
   const sprites = {
     front_default: data.sprites.other["official-artwork"].front_default,
