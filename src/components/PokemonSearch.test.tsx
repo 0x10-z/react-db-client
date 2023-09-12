@@ -10,14 +10,14 @@ jest.mock("../services/apiService");
 describe("<PokemonSearch />", () => {
   const mockPokemons = [
     {
-      id: "1",
+      id: 1,
       name: "Bulbasaur",
       sprites: {
         front_default: "some-image-url.png",
       },
     },
     {
-      id: "2",
+      id: 2,
       name: "Ivysaur",
       sprites: {
         front_default: "some-image-url2.png",
@@ -30,11 +30,17 @@ describe("<PokemonSearch />", () => {
   });
 
   it("should render the search bar and pokemons", async () => {
-    const { findByPlaceholderText, findByAltText } = render(<PokemonSearch />, {
-      wrapper: MemoryRouter,
-    });
+    const openModal = (pokemon: any) => {
+      // Esta es una función mock de openModal
+    };
 
-    const searchInput = await findByPlaceholderText("Search for a Pokemon...");
+    const { findByPlaceholderText, findByAltText } = render(
+      <MemoryRouter>
+        <PokemonSearch openModal={openModal} />{" "}
+      </MemoryRouter>
+    );
+
+    const searchInput = await findByPlaceholderText("Search for a Pokémon...");
     expect(searchInput).toBeInTheDocument();
 
     const bulbasaurImage = await findByAltText("Bulbasaur");
@@ -45,12 +51,18 @@ describe("<PokemonSearch />", () => {
   });
 
   it("should filter pokemons based on search input", async () => {
+    const openModal = (pokemon: any) => {
+      // Esta es una función mock de openModal
+    };
+
     const { findByPlaceholderText, getByAltText, queryByAltText } = render(
-      <PokemonSearch />,
-      { wrapper: MemoryRouter }
+      <MemoryRouter>
+        <PokemonSearch openModal={openModal} />{" "}
+        {/* Pasa openModal como una propiedad */}
+      </MemoryRouter>
     );
 
-    const searchInput = await findByPlaceholderText("Search for a Pokemon...");
+    const searchInput = await findByPlaceholderText("Search for a Pokémon...");
     fireEvent.change(searchInput, { target: { value: "Ivy" } });
 
     await waitFor(() => {

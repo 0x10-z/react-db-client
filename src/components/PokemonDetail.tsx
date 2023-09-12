@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchPokemonById } from "../services/apiService"; // Asegúrate de actualizar esta función en tu apiService
 import { Pokemon } from "../types";
-import Modal from "./Modal";
+import PokemonModal from "./PokemonModal";
 
-const PokemonDetail: React.FC = () => {
+const PokemonDetail: React.FC<{
+  onClose: () => void;
+  pokemon: Pokemon | null;
+}> = ({ onClose, pokemon }) => {
   const { param } = useParams<{ param: string }>();
 
   if (!param) {
@@ -12,26 +15,30 @@ const PokemonDetail: React.FC = () => {
   }
 
   const navigate = useNavigate();
-  const [pokemon, setPokemon] = useState<Pokemon | null>(null);
 
   useEffect(() => {
     const loadPokemon = async () => {
       const pokeData = await fetchPokemonById(parseInt(param));
-      setPokemon(pokeData);
+      // Actualiza el estado del Pokémon solo si está vacío (cuando se accede directamente a la ruta)
+      if (!pokemon) {
+        onClose();
+      }
+      // Actualiza los detalles del Pokémon
+      pokemon = pokeData;
     };
 
     loadPokemon();
-  }, [param]);
+  }, [param, onClose, pokemon]);
 
-  const handleCloseModal = () => {
-    navigate("/");
-  };
-
-  if (!pokemon) return <p>Loading...</p>;
+  if (!pokemon) {
+    // Si no hay Pokémon, muestra un mensaje de carga o maneja el caso adecuadamente
+    return <p>Loading...</p>;
+  }
 
   return (
     <div>
-      <Modal onClose={handleCloseModal} pokemon={pokemon} />
+      {/* Contenido del modal */}
+      <PokemonModal onClose={onClose} pokemon={pokemon} />
     </div>
   );
 };
