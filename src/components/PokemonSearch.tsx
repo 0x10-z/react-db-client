@@ -61,7 +61,7 @@ const PokemonSearch: React.FC = () => {
                 className="w-full max-h-60 h-auto"
               />
               <Link
-                to={`/pokemon/${pokemon.name}`}
+                to={`/pokemon/${pokemon.id}`}
                 className="text-center mt-2 block text-blue-800 font-semibold">
                 {pokemon.name}
               </Link>
