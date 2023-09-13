@@ -1,11 +1,7 @@
 import {
-  IPokemon,
   IGeneration,
   IEvolutionChain,
-  IType,
-  IPokemonSpecies,
   Pokedex,
-  IDamageRelations,
   Pokemon,
   IPokedex,
   IPokedexReference,

@@ -6,8 +6,9 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import PokemonModal from "./PokemonModal";
 import { Utils } from "../utils";
+import InfiniteScroll from "react-infinite-scroll-component";
 
-const PokemonSearch: React.FC<{}> = ({}) => {
+const PokemonSearch: React.FC = () => {
   const { searchQuery } = useParams();
   const isMounted = useRef(false); // Use useRef to track component mount state
 
@@ -16,7 +17,6 @@ const PokemonSearch: React.FC<{}> = ({}) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const [search, setSearch] = useState<string>(searchQuery || "");
@@ -28,6 +28,7 @@ const PokemonSearch: React.FC<{}> = ({}) => {
 
   const loadPokemons = async () => {
     try {
+      setLoading(true);
       const pokedex = await pokemonService.getPokedex(
         2,
         offset,
@@ -89,12 +90,10 @@ const PokemonSearch: React.FC<{}> = ({}) => {
 
   const handlePokemonClick = (pokemon: Pokemon) => {
     setSelectedPokemon(pokemon); // Limpiar el Pokémon seleccionado
-    setIsModalOpen(true); // Llamar a la función para abrir el modal con el Pokémon seleccionado
   };
 
   const closeModal = () => {
     setSelectedPokemon(null); // Limpiar el Pokémon seleccionado
-    setIsModalOpen(false); // Cerrar el modal
   };
 
   if (error) {
@@ -108,7 +107,8 @@ const PokemonSearch: React.FC<{}> = ({}) => {
         backgroundImage:
           "url('https://4kwallpapers.com/images/wallpapers/pikachu-pokemon-5k-8000x4500-10896.png')",
         backgroundPosition: "center",
-      }}>
+      }}
+    >
       <h1 className="text-4xl font-bold text-blue-800 mb-4">Pokédex</h1>
       <div className="w-full sm:max-w-screen-xl mb-4 flex">
         <input
@@ -119,54 +119,70 @@ const PokemonSearch: React.FC<{}> = ({}) => {
           className="p-2 border rounded w-1/2 mx-auto text-center"
         />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-        {loading ? (
-          Array.from({ length: skeletonCount }).map((_, index) => (
-            <Skeleton key={index} width={200} height={200} />
-          ))
-        ) : filteredPokemons.length === 0 ? (
-          <div className="text-center text-gray-600 flex-grow flex items-center justify-center">
-            No Pokémon found.
-          </div>
-        ) : (
-          filteredPokemons.map((pokemon) => (
+      <InfiniteScroll
+        dataLength={filteredPokemons.length}
+        next={handleLoadMore}
+        hasMore={filteredPokemons.length < totalEntries}
+        loader={
+          loading && (
             <div
-              key={pokemon.id}
-              data-id={pokemon.id}
-              className="border p-2 relative hover:transform hover:scale-105 transition-transform"
-              style={{
-                backdropFilter: "blur(2px) saturate(200%)",
-                WebkitBackdropFilter: "blur(2px) saturate(200%)",
-                backgroundColor: "rgba(255, 255, 255, 0.78)",
-                borderRadius: "12px",
-                border: "1px solid rgba(209, 213, 219, 0.3)",
-              }}
-              onClick={() => handlePokemonClick(pokemon)} // Llamar a la función al hacer clic
+              style={{ bottom: "6.25%" }}
+              className="fixed left-1/2 transform -translate-x-1/2 bg-white p-4 rounded shadow-md"
             >
-              <p className="absolute top-2 left-2 text-gray-500 font-semibold">
-                {pokemon.id}
-              </p>
-              <img
-                src={
-                  (pokemon.sprites &&
-                    pokemon.sprites.other["official-artwork"].front_default) ||
-                  "#"
-                }
-                alt={Utils.capitalizeFirstLetter(pokemon.name)}
-                className="w-full lg:max-h-60 h-auto object-fit"
-              />
-              <h1>{Utils.capitalizeFirstLetter(pokemon.name)}</h1>
+              <h4 className="text-center">Cargando...</h4>
             </div>
-          ))
-        )}
-      </div>
-      {filteredPokemons.length < totalEntries && (
-        <button
-          onClick={handleLoadMore}
-          className="mt-4 p-2 bg-blue-500 text-white rounded">
-          Cargar más
-        </button>
-      )}
+          )
+        }
+        endMessage={
+          <p className="text-center mt-4 text-gray-500">
+            ¡Has visto todos los Pokémon!
+          </p>
+        }
+        scrollThreshold="95%"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+          {loading && pokemons.length === 0 ? (
+            Array.from({ length: skeletonCount }).map((_, index) => (
+              <Skeleton key={index} width={200} height={200} />
+            ))
+          ) : filteredPokemons.length === 0 ? (
+            <div className="text-center text-gray-600 flex-grow flex items-center justify-center">
+              No Pokémon found.
+            </div>
+          ) : (
+            filteredPokemons.map((pokemon) => (
+              <div
+                key={pokemon.id}
+                data-id={pokemon.id}
+                className="border p-2 relative hover:transform hover:scale-105 transition-transform"
+                style={{
+                  backdropFilter: "blur(2px) saturate(200%)",
+                  WebkitBackdropFilter: "blur(2px) saturate(200%)",
+                  backgroundColor: "rgba(255, 255, 255, 0.78)",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(209, 213, 219, 0.3)",
+                }}
+                onClick={() => handlePokemonClick(pokemon)} // Llamar a la función al hacer clic
+              >
+                <p className="absolute top-2 left-2 text-gray-500 font-semibold">
+                  {pokemon.id}
+                </p>
+                <img
+                  src={
+                    (pokemon.sprites &&
+                      pokemon.sprites.other["official-artwork"]
+                        .front_default) ||
+                    "#"
+                  }
+                  alt={Utils.capitalizeFirstLetter(pokemon.name)}
+                  className="w-3/6 md:w-full lg:max-h-60 h-auto object-fit mx-auto"
+                />
+                <h1>{Utils.capitalizeFirstLetter(pokemon.name)}</h1>
+              </div>
+            ))
+          )}
+        </div>
+      </InfiniteScroll>
 
       <PokemonModal pokemon={selectedPokemon} onClose={closeModal} />
     </div>
