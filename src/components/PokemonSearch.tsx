@@ -167,13 +167,8 @@ const PokemonSearch: React.FC<{}> = ({}) => {
           Cargar más
         </button>
       )}
-      {isModalOpen && selectedPokemon && (
-        <PokemonModal
-          pokemon={selectedPokemon}
-          onClose={closeModal}
-          isModalOpen={isModalOpen}
-        />
-      )}
+
+      <PokemonModal pokemon={selectedPokemon} onClose={closeModal} />
     </div>
   );
 };

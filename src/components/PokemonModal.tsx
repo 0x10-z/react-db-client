@@ -136,19 +136,14 @@ const PokemonDetails: React.FC<PokemonDetailsProps> = ({
 };
 
 interface PokemonModalProps {
-  pokemon: Pokemon;
+  pokemon: Pokemon | null;
   onClose: () => void;
-  isModalOpen: boolean;
 }
 
-const PokemonModal: React.FC<PokemonModalProps> = ({
-  pokemon,
-  onClose,
-  isModalOpen,
-}) => {
+const PokemonModal: React.FC<PokemonModalProps> = ({ pokemon, onClose }) => {
   return (
     <Transition
-      show={isModalOpen}
+      show={pokemon != null}
       enter="transition-opacity ease-in-out duration-300"
       enterFrom="opacity-0"
       enterTo="opacity-100"
@@ -156,11 +151,9 @@ const PokemonModal: React.FC<PokemonModalProps> = ({
       leaveFrom="transform translate-x-0"
       leaveTo="transform translate-x-full"
       className="bg-primary absolute right-0 h-screen w-full md:w-1/4 md:rounded-tl-lg shadow-xl">
-      {(ref) => (
-        <ModalOverlay onClose={onClose}>
-          <PokemonDetails pokemon={pokemon} onClose={onClose} />
-        </ModalOverlay>
-      )}
+      <ModalOverlay onClose={onClose}>
+        {pokemon && <PokemonDetails pokemon={pokemon} onClose={onClose} />}
+      </ModalOverlay>
     </Transition>
   );
 };
