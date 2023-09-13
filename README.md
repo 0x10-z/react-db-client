@@ -58,5 +58,6 @@ Special thanks to [PokéAPI](https://pokeapi.co/) for providing the comprehensiv
 ## TODO
 
 - Pagination list
+- From Generation you obtain all pokemon names and urls
 - Pokemon detail: https://pokeapi.co/api/v2/pokemon/1/
   - sprites.other.official-artwork-fron_default
